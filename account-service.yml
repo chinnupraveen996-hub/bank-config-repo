@@ -1,14 +1,7 @@
-# ========================
-# Account Service Config
-# ========================
-
 server:
   port: 8081
 
 spring:
-  profiles:
-    active: default
-
   datasource:
     url: jdbc:mysql://localhost:3306/OBS_DB
     username: root
@@ -24,12 +17,6 @@ spring:
         format_sql: true
         jdbc.time_zone: UTC
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
 eureka:
   client:
     service-url:
@@ -38,9 +25,9 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
-    hostname: localhost
 
-logging:
-  level:
-    root: INFO
-    org.springframework: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
