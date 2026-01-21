@@ -10,7 +10,7 @@ spring:
     active: default
 
   datasource:
-    url: jdbc:mysql://localhost:3306/account_db
+    url: jdbc:mysql://localhost:3306/OBS_DB
     username: root
     password: praveen
     driver-class-name: com.mysql.cj.jdbc.Driver
