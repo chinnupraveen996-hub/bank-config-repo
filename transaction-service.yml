@@ -1,29 +1,46 @@
 server:
-  port: 8083
+  port: 8083   # Transaction Service runs on 8083
 
 spring:
   application:
-    name: transaction-service
+    name: transaction-service   # Service name for Eureka & Config Server
+
+ 
 
   datasource:
     url: jdbc:mysql://localhost:3306/transaction_db
     username: root
     password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # Automatically create/update tables in transaction_db
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
+# Eureka Client Configuration
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
 
+# Resilience4j Circuit Breaker configuration
 resilience4j:
   circuitbreaker:
     instances:
-      accountService:
+      accountService:           # This name must match the @CircuitBreaker name in Feign
         failure-rate-threshold: 50
         sliding-window-size: 10
         wait-duration-in-open-state: 10s
+        register-health-indicator: true   # Optional: adds health check for actuator
+
+# Optional logging
+logging:
+  level:
+    root: INFO
+    com.pinnancle: DEBUG
