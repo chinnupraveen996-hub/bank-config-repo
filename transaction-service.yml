@@ -1,39 +1,56 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: transaction-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/transaction_db
+    username: root
+    password: praveen
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
   cloud:
     stream:
       kafka:
         binder:
-          brokers: localhost:9092       # your Kafka broker
-          autoCreateTopics: true        # create topics automatically if missing
+          brokers: localhost:9092
+          autoCreateTopics: true
       bindings:
         transactionCreatedEvent-out-0:
           destination: transaction-created-topic
           producer:
-            retries: 3                  # limit producer retry attempts
+            retries: 3
 
     loadbalancer:
       ribbon:
-        enabled: false                 # disable Ribbon if not needed
+        enabled: false
       retry:
-        enabled: false                 # prevent infinite retries on load balancer
+        enabled: false
 
 feign:
   client:
     config:
       default:
-        connectTimeout: 5000          # 5 seconds connection timeout
-        readTimeout: 5000             # 5 seconds read timeout
+        connectTimeout: 5000
+        readTimeout: 5000
         retryer:
-          period: 1000                # 1 second between retries
-          maxPeriod: 5000             # max wait
-          maxAttempts: 3              # max 3 retries
+          period: 1000
+          maxPeriod: 5000
+          maxAttempts: 3
 
 resilience4j:
   retry:
     instances:
       transactionServiceRetry:
-        max-attempts: 3               # max retries
-        wait-duration: 2s             # wait between retries
+        max-attempts: 3
+        wait-duration: 2s
