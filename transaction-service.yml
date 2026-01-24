@@ -1,9 +1,9 @@
 server:
-  port: 8083   # Transaction Service runs on 8083
+  port: 8083
 
 spring:
   application:
-    name: transaction-service   # Service name for Eureka & Config Server
+    name: transaction-service
 
   datasource:
     url: jdbc:mysql://localhost:3306/transaction_db
@@ -13,11 +13,22 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update   # Automatically create/update tables in transaction_db
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+
+  cloud:
+    stream:
+      bindings:
+        transactionCreatedEvent-out-0:
+          destination: transaction-created-topic
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: localhost:9092
+          defaultBrokerPort: 9092
 
 # Eureka Client Configuration
 eureka:
@@ -31,26 +42,12 @@ eureka:
 resilience4j:
   circuitbreaker:
     instances:
-      accountService:           # This name must match the @CircuitBreaker name in Feign
+      accountService:
         failure-rate-threshold: 50
         sliding-window-size: 10
         wait-duration-in-open-state: 10s
-        register-health-indicator: true   # Optional: adds health check for actuator
+        register-health-indicator: true
 
-# Spring Cloud Stream (Kafka) Producer Config
-spring:
-  cloud:
-    stream:
-      bindings:
-        # 👇 Producer channel name (must match the @Bean name in producer code)
-        transactionCreatedEvent-out-0:  
-          destination: transaction-created-topic  # Kafka topic
-          content-type: application/json
-      kafka:
-        binder:
-          brokers: localhost:9092    # Kafka bootstrap server
-          defaultBrokerPort: 9092
-          
 # Optional logging
 logging:
   level:
