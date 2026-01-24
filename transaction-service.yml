@@ -27,7 +27,7 @@ spring:
           autoCreateTopics: true
       bindings:
         transactionCreatedEvent-out-0:
-          destination: transaction-created-topic
+          destination: transaction-topic
           producer:
             retries: 3
 
