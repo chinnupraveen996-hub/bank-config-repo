@@ -1,55 +1,39 @@
-server:
-  port: 8083
-
 spring:
   application:
     name: transaction-service
 
-  datasource:
-    url: jdbc:mysql://localhost:3306/transaction_db
-    username: root
-    password: praveen
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
   cloud:
     stream:
+      kafka:
+        binder:
+          brokers: localhost:9092       # your Kafka broker
+          autoCreateTopics: true        # create topics automatically if missing
       bindings:
         transactionCreatedEvent-out-0:
           destination: transaction-created-topic
-          content-type: application/json
-      kafka:
-        binder:
-          brokers: localhost:9092
-          defaultBrokerPort: 9092
+          producer:
+            retries: 3                  # limit producer retry attempts
 
-# Eureka Client Configuration
-eureka:
+    loadbalancer:
+      ribbon:
+        enabled: false                 # disable Ribbon if not needed
+      retry:
+        enabled: false                 # prevent infinite retries on load balancer
+
+feign:
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-    register-with-eureka: true
-    fetch-registry: true
+    config:
+      default:
+        connectTimeout: 5000          # 5 seconds connection timeout
+        readTimeout: 5000             # 5 seconds read timeout
+        retryer:
+          period: 1000                # 1 second between retries
+          maxPeriod: 5000             # max wait
+          maxAttempts: 3              # max 3 retries
 
-# Resilience4j Circuit Breaker configuration
 resilience4j:
-  circuitbreaker:
+  retry:
     instances:
-      accountService:
-        failure-rate-threshold: 50
-        sliding-window-size: 10
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-
-# Optional logging
-logging:
-  level:
-    root: INFO
-    com.pinnancle: DEBUG
+      transactionServiceRetry:
+        max-attempts: 3               # max retries
+        wait-duration: 2s             # wait between retries
